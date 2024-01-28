@@ -1,9 +1,10 @@
 package mx.dwtraining.droidbountyhunter
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
-import com.google.android.material.snackbar.Snackbar
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.viewpager.widget.ViewPager
 import androidx.appcompat.app.AppCompatActivity
 import mx.dwtraining.droidbountyhunter.ui.main.SectionsPagerAdapter
@@ -28,9 +29,8 @@ class HomeActivity : AppCompatActivity() {
 
         binding.tabs.setupWithViewPager(viewPager)
 
-        binding.fab.setOnClickListener { view ->
-            Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                .setAction("Action", null).show()
+        binding.fab.setOnClickListener {
+            resultLauncher.launch(Intent(this, AgregarActivity::class.java))
         }
     }
 
@@ -40,17 +40,18 @@ class HomeActivity : AppCompatActivity() {
         return true
     }
 
+    private val resultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+        // TODO handle the result
+    }
+
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        val id = item.itemId
-
-        if (id == R.id.action_settings) {
-            return true
+        return when(item.itemId) {
+            R.id.menu_agregar -> {
+                resultLauncher.launch(Intent(this, AgregarActivity::class.java))
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
         }
-
-        return super.onOptionsItemSelected(item)
     }
 
 }
