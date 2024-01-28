@@ -7,6 +7,7 @@ import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentPagerAdapter
 import mx.dwtraining.droidbountyhunter.R
 import mx.dwtraining.droidbountyhunter.fragments.AcercaDeFragment
+import mx.dwtraining.droidbountyhunter.fragments.FugitivoListener
 import mx.dwtraining.droidbountyhunter.fragments.ListFragment
 import mx.dwtraining.droidbountyhunter.fragments.SECTION_NUMBER
 import java.util.Locale
@@ -15,14 +16,18 @@ import java.util.Locale
  * A [FragmentPagerAdapter] that returns a fragment corresponding to
  * one of the sections/tabs/pages.
  */
-class SectionsPagerAdapter(private val context: Context, fm: FragmentManager) : FragmentPagerAdapter(fm) {
+class SectionsPagerAdapter(
+    private val context: Context,
+    private val listener: FugitivoListener,
+    fm: FragmentManager
+) : FragmentPagerAdapter(fm) {
 
     private var fragments: ArrayList<Fragment> = ArrayList()
 
     override fun getItem(position: Int): Fragment {
         if (fragments.size < 3){ // Si no contiene los 3 fragments los agregará
             if (position < 2){
-                fragments.add(position, ListFragment())
+                fragments.add(position, ListFragment(listener))
                 val arguments = Bundle()
                 arguments.putInt(SECTION_NUMBER, position)
                 fragments[position].arguments = arguments

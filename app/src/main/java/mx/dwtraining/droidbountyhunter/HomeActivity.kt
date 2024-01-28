@@ -9,10 +9,14 @@ import androidx.viewpager.widget.ViewPager
 import androidx.appcompat.app.AppCompatActivity
 import mx.dwtraining.droidbountyhunter.ui.main.SectionsPagerAdapter
 import mx.dwtraining.droidbountyhunter.databinding.ActivityHomeBinding
+import mx.dwtraining.droidbountyhunter.fragments.FugitivoListener
+import mx.dwtraining.droidbountyhunter.models.Fugitivo
 
-class HomeActivity : AppCompatActivity() {
+class HomeActivity : AppCompatActivity(), FugitivoListener {
 
     private lateinit var binding: ActivityHomeBinding
+
+    private var sectionsPagerAdapter: SectionsPagerAdapter? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -20,7 +24,7 @@ class HomeActivity : AppCompatActivity() {
         binding = ActivityHomeBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val sectionsPagerAdapter = SectionsPagerAdapter(this, supportFragmentManager)
+        sectionsPagerAdapter = SectionsPagerAdapter(this, this, supportFragmentManager)
 
         setSupportActionBar(binding.toolbar)
 
@@ -41,7 +45,7 @@ class HomeActivity : AppCompatActivity() {
     }
 
     private val resultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-        // TODO handle the result
+        actualizarListas(it.resultCode)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -54,4 +58,14 @@ class HomeActivity : AppCompatActivity() {
         }
     }
 
+    private fun actualizarListas(index: Int){
+        binding.viewPager.adapter = sectionsPagerAdapter
+        binding.viewPager.currentItem = index
+    }
+
+    override fun fugitivoSeleccionado(fugitivo: Fugitivo) {
+        val intent = Intent(this, DetalleActivity::class.java)
+        intent.putExtra("fugitivo", fugitivo)
+        resultLauncher.launch(intent)
+    }
 }
