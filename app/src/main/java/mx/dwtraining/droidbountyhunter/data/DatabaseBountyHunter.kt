@@ -18,7 +18,7 @@ const val COLUMN_NAME_ID = "id"
 const val COLUMN_NAME_NAME = "name"
 const val COLUMN_NAME_STATUS = "status"
 
-class DatabaseBountyHunter(val context: Context) {
+class DatabaseBountyHunter(private val context: Context) {
     private val TAG: String = DatabaseBountyHunter::class.java.simpleName
 
     /** ------------------- Declaración de Tablas ----------------------------**/

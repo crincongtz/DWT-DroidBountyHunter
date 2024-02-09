@@ -10,6 +10,12 @@ import mx.dwtraining.droidbountyhunter.R
 import mx.dwtraining.droidbountyhunter.data.DatabaseBountyHunter
 import mx.dwtraining.droidbountyhunter.databinding.FragmentListBinding
 import mx.dwtraining.droidbountyhunter.models.Fugitivo
+import mx.dwtraining.droidbountyhunter.network.ApiClient
+import mx.dwtraining.droidbountyhunter.network.NetworkHelper.ERR_NAME_NOT_RESOLVED
+import mx.dwtraining.droidbountyhunter.network.NetworkHelper.manageError
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 const val SECTION_NUMBER : String = "section_number"
 
@@ -44,7 +50,43 @@ class ListFragment(private val listener: FugitivoListener) : Fragment() {
             val adaptador = ArrayAdapter<String>(requireContext(), R.layout.item_fugitivo_list, values)
             binding.listaFugitivosCapturados.adapter = adaptador
             binding.listaFugitivosCapturados.tag = fugitivos
+        } else { // La base de datos se encuentra vacía
+            if (modo == 0) {
+                showProgressBar()
+
+                val call = ApiClient.apiService.getFugitivos()
+                call.enqueue(object : Callback<List<Fugitivo>> {
+                    override fun onResponse(call: Call<List<Fugitivo>>, response: Response<List<Fugitivo>>) {
+                        hideProgressBar()
+                        if (response.isSuccessful) {
+                            val fugitivoList = response.body()
+                            fugitivoList?.toList()?.forEach {
+                                database.insertarFugitivo(it)
+                            }
+                            actualizarDatos(modo)
+                        } else {
+                            // Handle error
+                            manageError(requireContext(), response.code(), response.message())
+                        }
+                    }
+
+                    override fun onFailure(call: Call<List<Fugitivo>>, t: Throwable) {
+                        // Handle failure
+                        t.printStackTrace()
+                        hideProgressBar()
+                        manageError(requireContext(), ERR_NAME_NOT_RESOLVED, t.cause.toString())
+                    }
+                })
+            }
         }
+    }
+
+    private fun showProgressBar() {
+        binding.progressIndicator.visibility = View.VISIBLE
+    }
+
+    private fun hideProgressBar() {
+        binding.progressIndicator.visibility = View.GONE
     }
 }
 

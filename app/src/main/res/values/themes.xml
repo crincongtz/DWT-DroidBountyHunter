@@ -18,4 +18,9 @@
     <style name="Theme.DroidBountyHunter.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 
     <style name="Theme.DroidBountyHunter.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+
+    <!-- Theme to stylize Circular Progress indicator -->
+    <style name="Common.CircularProgressTheme" parent="Theme.AppCompat.Light">
+        <item name="colorAccent">@color/colorPrimary</item>
+    </style>
 </resources>
