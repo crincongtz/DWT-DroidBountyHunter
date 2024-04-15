@@ -48,4 +48,18 @@ object PermissionUtils {
             }
         }
     }
+
+    fun permissionUseGPS(context: Activity, requestCode: Int): Boolean {
+        return if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            if (ActivityCompat.shouldShowRequestPermissionRationale(context, Manifest.permission.ACCESS_FINE_LOCATION)) {
+                ActivityCompat.requestPermissions(context, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), requestCode)
+                false
+            } else {
+                ActivityCompat.requestPermissions(context, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), requestCode)
+                false
+            }
+        } else {
+            true
+        }
+    }
 }

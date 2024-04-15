@@ -5,15 +5,14 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.os.Looper
 import android.provider.MediaStore
 import android.provider.Settings
 import android.util.Log
 import android.view.MenuItem
 import android.view.View
-import android.widget.ImageView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
@@ -21,6 +20,13 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.IntentCompat
 import com.bumptech.glide.Glide
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.Granularity
+import com.google.android.gms.location.LocationCallback
+import com.google.android.gms.location.LocationRequest
+import com.google.android.gms.location.LocationResult
+import com.google.android.gms.location.LocationServices
+import com.google.android.gms.location.Priority
 import mx.dwtraining.droidbountyhunter.data.DatabaseBountyHunter
 import mx.dwtraining.droidbountyhunter.databinding.ActivityDetalleBinding
 import mx.dwtraining.droidbountyhunter.models.Fugitivo
@@ -29,6 +35,7 @@ import mx.dwtraining.droidbountyhunter.models.FugitivoResponse
 import mx.dwtraining.droidbountyhunter.network.ApiClient
 import mx.dwtraining.droidbountyhunter.network.NetworkHelper
 import mx.dwtraining.droidbountyhunter.utils.PermissionUtils
+import mx.dwtraining.droidbountyhunter.utils.PermissionUtils.permissionUseGPS
 import mx.dwtraining.droidbountyhunter.utils.PictureTools
 import mx.dwtraining.droidbountyhunter.utils.PictureTools.Companion.MEDIA_TYPE_IMAGE
 import retrofit2.Call
@@ -43,14 +50,19 @@ class DetalleActivity : AppCompatActivity(){
     private var fugitivo: Fugitivo? = null
     private var database: DatabaseBountyHunter? = null
 
-    private var direccionImagen: Uri? = null
-    private var pictureFugitivo: ImageView? = null
+    private val REQUEST_CODE_GPS = 1234
+
+    private lateinit var fusedLocationClient: FusedLocationProviderClient
+    private lateinit var locationRequest: LocationRequest
+    private lateinit var locationCallback: LocationCallback
 
     @SuppressLint("HardwareIds")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityDetalleBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        setupLocationObjects()
 
         UDID = Settings.Secure.getString(contentResolver, Settings.Secure.ANDROID_ID)
 
@@ -63,6 +75,7 @@ class DetalleActivity : AppCompatActivity(){
         // Se identifica si es Fugitivo o capturado para el mensaje...
         if (fugitivo!!.status == 0){
             binding.etiquetaMensaje.text = "El fugitivo sigue suelto..."
+            activarGPS()
         }else{
             binding.etiquetaMensaje.text = "Atrapado!!!"
             binding.botonCapturar.visibility = View.GONE
@@ -86,6 +99,32 @@ class DetalleActivity : AppCompatActivity(){
         }
         binding.botonTomarFoto.setOnClickListener {
             tomarFotoFugitivo()
+        }
+        binding.botonVerMapa.setOnClickListener {
+            abrirMapa()
+        }
+    }
+
+    private fun setupLocationObjects() {
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
+
+        locationRequest = LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 10000).apply {
+            setMinUpdateDistanceMeters(100f)
+            setGranularity(Granularity.GRANULARITY_PERMISSION_LEVEL)
+            setWaitForAccurateLocation(true)
+        }.build()
+
+        locationCallback = object : LocationCallback() {
+
+            override fun onLocationResult(locationResult: LocationResult) {
+                val location = locationResult.lastLocation
+                if (location != null) {
+                    fugitivo!!.latitude = location.latitude
+                    fugitivo!!.longitude = location.longitude
+                } else {
+                    Log.d("LocationCallback", "Location missing in callback.")
+                }
+            }
         }
     }
 
@@ -148,9 +187,15 @@ class DetalleActivity : AppCompatActivity(){
         }
     }
 
+    private fun abrirMapa() {
+        val intent = Intent(this, MapsActivity::class.java)
+        intent.putExtra("fugitivo", fugitivo)
+        startActivity(intent)
+    }
+
     private fun obtenFotoDeCamara() {
         val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-        direccionImagen = PictureTools.getOutputMediaFileUri(this, MEDIA_TYPE_IMAGE)
+        val direccionImagen = PictureTools.getOutputMediaFileUri(this, MEDIA_TYPE_IMAGE)
         intent.putExtra(MediaStore.EXTRA_OUTPUT, direccionImagen)
         resultLauncher.launch(intent)
     }
@@ -163,6 +208,37 @@ class DetalleActivity : AppCompatActivity(){
                 .load(fugitivo!!.photo)
                 .into(binding.pictureFugitive)
         }
+    }
+
+    @SuppressLint("MissingPermission")
+    private fun activarGPS() {
+        if (permissionUseGPS(this, REQUEST_CODE_GPS)) {
+            fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, Looper.myLooper())
+            Toast.makeText(this, "Activando GPS...", Toast.LENGTH_LONG).show()
+
+            fusedLocationClient.lastLocation.addOnSuccessListener {location ->
+                fugitivo!!.latitude = location.latitude
+                fugitivo!!.longitude = location.longitude
+            }
+        }
+    }
+
+    private fun apagarGPS() {
+        Toast.makeText(this, "Desactivando GPS...", Toast.LENGTH_LONG).show()
+
+        val removeTask = fusedLocationClient?.removeLocationUpdates(locationCallback)
+        removeTask?.addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                Log.d("LocationRequest", "Location Callback removed")
+            } else {
+                Log.w("LocationRequest", "Failed to remove Location Callback")
+            }
+        }
+    }
+
+    override fun onStop() {
+        super.onStop()
+        apagarGPS()
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
@@ -184,6 +260,12 @@ class DetalleActivity : AppCompatActivity(){
                 } else {
                     Log.w("RequestPermissions", "Camera - Not Granted")
                 }
+            }
+        } else if (requestCode == REQUEST_CODE_GPS) {
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                activarGPS()
+            } else {
+                Log.w("RequestPermissions", "GPS - Not Granted")
             }
         }
     }

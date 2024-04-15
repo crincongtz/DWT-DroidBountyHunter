@@ -64,6 +64,18 @@
             android:textAppearance="@style/Base.TextAppearance.AppCompat.Body1"
             />
 
+        <Button
+            android:id="@+id/botonVerMapa"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:minHeight="30dp"
+            android:minWidth="100dp"
+            android:text="@string/boton_mapa"
+            android:layout_below="@id/botonTomarFoto"
+            android:layout_centerHorizontal="true"
+            android:textAppearance="@style/Base.TextAppearance.AppCompat.Body1"
+            />
+
     </RelativeLayout>
 
     <ProgressBar

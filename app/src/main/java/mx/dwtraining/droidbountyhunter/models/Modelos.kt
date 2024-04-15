@@ -10,7 +10,9 @@ data class Fugitivo(
     @SerializedName("name")
     var name: String,
     var status: Int = 0,
-    var photo: String? = ""
+    var photo: String? = "",
+    var latitude: Double = 0.0,
+    var longitude: Double = 0.0
 ): Parcelable
 
 /**

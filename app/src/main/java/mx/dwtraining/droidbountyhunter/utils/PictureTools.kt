@@ -24,8 +24,8 @@ class PictureTools {
     private var context: Context? = null
 
     companion object {
-        val MEDIA_TYPE_IMAGE = 1
-        val REQUEST_CODE = 1707
+        const val MEDIA_TYPE_IMAGE = 1
+        const val REQUEST_CODE = 1707
 
         private val TAG = PictureTools::class.java.simpleName
         private var BASE_PATH = ""
