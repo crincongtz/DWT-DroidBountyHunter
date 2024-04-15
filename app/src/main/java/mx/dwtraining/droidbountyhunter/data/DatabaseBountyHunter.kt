@@ -11,12 +11,13 @@ import mx.dwtraining.droidbountyhunter.models.Fugitivo
 /** ------------------- Nombre de Base de Datos --------------------------**/
 const val DATABASE_NAME = "DroidBountyHunterDatabase"
 /** ------------------ Versión de Base de Datos --------------------------**/
-const val VERSION = 1
+const val VERSION = 2
 /** ---------------------- Tablas y Campos -------------------------------**/
 const val TABLE_NAME_FUGITIVOS = "fugitivos"
 const val COLUMN_NAME_ID = "id"
 const val COLUMN_NAME_NAME = "name"
 const val COLUMN_NAME_STATUS = "status"
+const val COLUMN_NAME_PHOTO = "photo"
 
 class DatabaseBountyHunter(private val context: Context) {
     private val TAG: String = DatabaseBountyHunter::class.java.simpleName
@@ -26,6 +27,7 @@ class DatabaseBountyHunter(private val context: Context) {
             COLUMN_NAME_ID + " INTEGER PRIMARY KEY NOT NULL, " +
             COLUMN_NAME_NAME + " TEXT NOT NULL, " +
             COLUMN_NAME_STATUS + " INTEGER, " +
+            COLUMN_NAME_PHOTO + " TEXT, " +
             "UNIQUE (" + COLUMN_NAME_NAME + ") ON CONFLICT REPLACE);"
 
     /** ---------------------- Variables y Helpers ---------------------------**/
@@ -75,6 +77,7 @@ class DatabaseBountyHunter(private val context: Context) {
         val values = ContentValues()
         values.put(COLUMN_NAME_NAME, fugitivo.name)
         values.put(COLUMN_NAME_STATUS, fugitivo.status)
+        values.put(COLUMN_NAME_PHOTO, fugitivo.photo)
         database!!.update(TABLE_NAME_FUGITIVOS, values, COLUMN_NAME_ID + "=?", arrayOf(fugitivo.id.toString()))
         close()
     }
@@ -83,6 +86,7 @@ class DatabaseBountyHunter(private val context: Context) {
         val values = ContentValues()
         values.put(COLUMN_NAME_NAME, fugitivo.name)
         values.put(COLUMN_NAME_STATUS, fugitivo.status)
+        values.put(COLUMN_NAME_PHOTO, fugitivo.photo)
         open()
         database!!.insert(TABLE_NAME_FUGITIVOS, null, values)
         close()
@@ -99,7 +103,8 @@ class DatabaseBountyHunter(private val context: Context) {
                 val name = it.getString(it.getColumnIndexOrThrow(COLUMN_NAME_NAME))
                 val statusFugitivo = it.getInt(it.getColumnIndexOrThrow(COLUMN_NAME_STATUS))
                 val id = it.getInt(it.getColumnIndexOrThrow(COLUMN_NAME_ID))
-                return@map Fugitivo(id, name, statusFugitivo)
+                val photo = it.getString(it.getColumnIndexOrThrow(COLUMN_NAME_PHOTO))
+                return@map Fugitivo(id, name, statusFugitivo, photo)
             }.toList().toTypedArray()
         }
         return fugitivos

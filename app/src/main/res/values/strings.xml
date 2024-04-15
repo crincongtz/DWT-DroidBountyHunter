@@ -14,6 +14,8 @@
     <string name="boton_guardar">Guardar</string>
     <string name="boton_eliminar">Eliminar</string>
     <string name="boton_capturar">Capturar</string>
+    <string name="boton_foto">Tomar Foto</string>
+
     <string name="campo_nombre">Nombre del Fugitivo</string>
     <string name="etiqueta_desarrollo">Desarrollado por:</string>
     <string name="nombre_desarrollador">Alejandro Rincón</string>

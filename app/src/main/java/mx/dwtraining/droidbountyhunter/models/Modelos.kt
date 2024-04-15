@@ -9,7 +9,8 @@ data class Fugitivo(
     val id: Int = 0,
     @SerializedName("name")
     var name: String,
-    var status: Int = 0
+    var status: Int = 0,
+    var photo: String? = ""
 ): Parcelable
 
 /**
