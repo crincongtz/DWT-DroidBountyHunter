@@ -169,20 +169,30 @@ class DetalleActivity : AppCompatActivity(){
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (requestCode == PictureTools.REQUEST_CODE) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_MEDIA_IMAGES) == PackageManager.PERMISSION_GRANTED
-                    && ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
+                if (ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
+                    Log.i("RequestPermissions", "Camera - GRANTED")
                     obtenFotoDeCamara()
                 } else {
-                    Log.w("RequestPermissions", "Camera - Not Granted")
+                    Log.e("RequestPermissions", "Camera - Not Granted")
+                }
+            } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                if  (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
+                    && ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED)
+                {
+                    Log.i("RequestPermissions", "Camera - GRANTED")
+                    obtenFotoDeCamara()
+                } else {
+                    Log.e("RequestPermissions", "Camera - Not Granted")
                 }
             } else {
                 if  (ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
                     && ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
                     && ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED)
                 {
+                    Log.i("RequestPermissions", "Camera - GRANTED")
                     obtenFotoDeCamara()
                 } else {
-                    Log.w("RequestPermissions", "Camera - Not Granted")
+                    Log.e("RequestPermissions", "Camera - Not Granted")
                 }
             }
         }
