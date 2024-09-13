@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "428342427709",
+    "project_id": "pcqbica-d5e3e",
+    "storage_bucket": "pcqbica-d5e3e.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:428342427709:android:21ec7c25bf1c5a85516a54",
+        "android_client_info": {
+          "package_name": "mx.dwtraining.droidbountyhunter"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAAhogpMWxnx89jI3m1e89X4Z2hk08GlV0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

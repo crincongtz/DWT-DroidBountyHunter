@@ -2,6 +2,8 @@ plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
     id("kotlin-parcelize")
+    id("com.google.gms.google-services")
+    id("com.google.firebase.crashlytics")
 }
 
 android {
@@ -54,6 +56,10 @@ dependencies {
     // MAPAS
     implementation ("com.google.android.gms:play-services-maps:18.2.0") // Maps
     implementation ("com.google.android.gms:play-services-location:21.2.0") // Lat Lng
+
+    // Firebase
+    implementation ("com.google.firebase:firebase-analytics:22.1.0")
+    implementation ("com.google.firebase:firebase-crashlytics:19.0.3")
 
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
